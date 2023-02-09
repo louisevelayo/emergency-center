@@ -1,0 +1,32 @@
+#ifndef COMPONENT_H
+#define COMPONENT_H
+
+#include <vector>
+#include <memory>
+
+class Sensor;
+class Location;
+
+class Component {
+
+
+public:
+
+<<<<<<< HEAD
+    //virtual void addChild(std::shared_ptr<Component> componentchild)=0;
+    //virtual void trigger(bool trigger_variable)=0;
+    //virtual void activate(bool activation)=0;
+=======
+    virtual void addChild(std::shared_ptr<Component> componentchild)=0;
+    virtual void trigger(bool trigger_variable)=0;
+    virtual void testSensorAction()=0;
+>>>>>>> 975c562e404ac42c025e77b999340887d08efe98
+
+    virtual void operator++()=0;
+    virtual void operator--()=0;
+
+    virtual std::vector<std::shared_ptr<Sensor>> getSensors()=0;
+    virtual std::vector<std::shared_ptr<Location>> getLocations()=0;
+};
+
+#endif

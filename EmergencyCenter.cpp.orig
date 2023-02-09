@@ -1,0 +1,279 @@
+#include "EmergencyCenter.h"
+#include "Component.h"
+
+#include<algorithm>
+#include<iostream>
+#include<fstream>
+#include<string>
+#include<vector>
+
+using namespace std;
+
+EmergencyCenter* EmergencyCenter::ecInstance = nullptr;
+
+EmergencyCenter::EmergencyCenter(){};
+
+EmergencyCenter* EmergencyCenter::getInstance() {
+    if(ecInstance == nullptr){
+        ecInstance = new EmergencyCenter();
+    }
+    return ecInstance;
+}
+
+std::vector<std::shared_ptr<Sensor>> EmergencyCenter::getSensorList() {
+    std::vector<std::shared_ptr<Sensor>> mySensors;
+    for(int i = 0; i<(int)components.size(); i++){
+        std::vector<std::shared_ptr<Sensor>> sensorsInLocation = components.at(i)->getSensors();
+        mySensors.insert(mySensors.end(), sensorsInLocation.begin(), sensorsInLocation.end());
+    }
+    return mySensors;
+}
+
+
+
+
+//TODO: @Sam needs to make IDs in Component, Locaiton and Sensor
+void EmergencyCenter::removeSensor(int index, std::vector<std::shared_ptr<Sensor>> listOfSensors) {
+    for(int i = 0; i<(int)listOfSensors.size(); i++){
+        if(listOfSensors.at(i)->getSensorID() == index){
+                listOfSensors.erase(listOfSensors.begin()+i);
+        }
+    }
+}
+
+std::vector<std::shared_ptr<Location>> EmergencyCenter::getAllLocations()
+{
+    std::vector<std::shared_ptr<Location>> listLocations;
+    for(int i = 0; i < (int)components.size(); i++)
+    {
+        std::vector<std::shared_ptr<Location>> tempLocations = components.at(i)->getLocations();
+        listLocations.insert(listLocations.end(), tempLocations.begin(), tempLocations.end());
+    }
+    return listLocations;
+}
+
+
+void EmergencyCenter::add(std::shared_ptr<Location> location){
+    components.push_back(location);
+}
+
+void EmergencyCenter::addChildToParent(std::shared_ptr<Location> l, std::shared_ptr<Component> c){
+    // TODO - implement EmergencyCenter::addChildToParent
+    std::string tempLocation = l->getName();
+    std::vector<std::shared_ptr<Location>> allLocations = getAllLocations();
+    for(int i = 0; i < (int)allLocations.size(); i++){
+        if(tempLocation == allLocations.at(i)->getName()){
+           allLocations.at(i)->add(c);
+        }
+    }
+}
+
+std::vector<std::shared_ptr<Sensor>> EmergencyCenter::getAllByVendor(std::string vendor, std::vector<std::shared_ptr<Sensor>> sensors){
+    std::vector<std::shared_ptr<Sensor>> sensorsByVendor;
+    for(int i = 0; i < (int)sensors.size(); i++){
+        if(vendor == sensors.at(i)->getVendorName()){
+            sensorsByVendor.push_back(sensors.at(i));
+        }
+    }
+    return sensorsByVendor;
+}
+
+std::vector<std::shared_ptr<Sensor>> EmergencyCenter::getAllByType(std::string type, std::vector<std::shared_ptr<Sensor>> sensors){
+    std::vector<std::shared_ptr<Sensor>> sensorsByType;
+    for(int i = 0; i < (int)sensors.size(); i++){
+        if(type == sensors.at(i)->getSensorType()){
+            sensorsByType.push_back(sensors.at(i));
+        }
+    }
+    return sensorsByType;
+}
+
+std::vector<std::shared_ptr<Sensor>> EmergencyCenter::getAllByLocation(std::string location, std::vector<std::shared_ptr<Sensor>> sensors){
+    std::vector<std::shared_ptr<Sensor>> sensorsByLocation;
+    for(int i = 0; i < (int)sensors.size(); i++){
+        if(sensors.at(i)->getSensorLocation().compare(location) == 0){
+            sensorsByLocation.push_back(sensors.at(i));
+        }
+    }
+    return sensorsByLocation;
+}
+
+std::vector<std::shared_ptr<Location>> EmergencyCenter::getLocationsByLocations(std::string location, std::vector<std::shared_ptr<Location>> locations){
+    std::vector<std::shared_ptr<Location>> locationsByLocation;
+    for(int i = 0; i < (int)locations.size(); i++){
+        if(locations.at(i)->getName().compare(location) == 0){
+            locationsByLocation.push_back(locations.at(i));
+        }
+    }
+    return locationsByLocation;
+}
+
+std::vector<std::shared_ptr<Sensor>> EmergencyCenter::getAllByLocationPointer(std::shared_ptr<Location> locationPointer)
+{
+    std::vector<std::shared_ptr<Sensor>> sensors;
+    sensors =  locationPointer->getSensors();
+    return sensors;
+}
+
+/*
+std::vector<std::shared_ptr<Location>> EmergencyCenter::getAllLocations(std::vector<std::shared_ptr<Component>> components){
+    std::vector<std::shared_ptr<Location>> locationsTemp;
+    for(int i=0; i<(int)components.size(); i++){
+        std::vector<std::shared_ptr<Location>> temp = components.at(i)->getLocations();
+        locationsTemp.insert(locationsTemp.end(), temp.begin(), temp.end());
+    }
+    return locationsTemp;
+}
+*/
+/*
+ * lambdas used in each of the orderBy expressions below. This is because
+ * the sorting condition is not reused elsewhere.
+ */
+
+std::vector<std::shared_ptr<Sensor>> EmergencyCenter::orderById(std::vector<std::shared_ptr<Sensor>> vector){
+    std::sort(vector.begin(),
+              vector.end(),
+              [](std::shared_ptr<Sensor> sensor1, std::shared_ptr<Sensor> sensor2){
+                return (sensor1->getSensorID() < sensor2->getSensorID());
+              });
+    return vector;
+
+}
+
+std::vector<std::shared_ptr<Sensor>> EmergencyCenter::orderByVendor(std::vector<std::shared_ptr<Sensor>> vector){
+    std::sort(vector.begin(),
+              vector.end(),
+              [](std::shared_ptr<Sensor> sensor1, std::shared_ptr<Sensor> sensor2){
+                return (sensor1->getVendorName() < sensor2->getVendorName());});
+    return vector;
+}
+
+std::vector<std::shared_ptr<Sensor>> EmergencyCenter::orderByLocation(std::vector<std::shared_ptr<Sensor>> vector){
+    std::sort(vector.begin(),
+              vector.end(),
+              [](std::shared_ptr<Sensor> sensor1, std::shared_ptr<Sensor> sensor2){
+                return (sensor1->getSensorLocation() < sensor2->getSensorLocation());});
+    return vector;
+}
+
+
+void EmergencyCenter::overviewSensorsInVector(std::vector<std::shared_ptr<Sensor>> vector){
+    for(auto & s : vector){
+        std::cout << *s << std::endl;
+    }
+}
+
+void EmergencyCenter::overviewLocationsInVector(std::vector<std::shared_ptr<Location>> vector){
+    for(auto & l : vector){
+        std::cout << l->getName() << endl;
+    }
+}
+
+void EmergencyCenter::overviewLocations(){
+    return overviewLocationsInVector(getAllLocations());
+}
+
+void EmergencyCenter::overviewLocationsByLocation(std::string location){
+    return overviewLocationsInVector(getLocationsByLocations(location, getAllLocations()));
+}
+
+void EmergencyCenter::overviewSensors(){
+    return overviewSensorsInVector(getSensorList());
+}
+
+void EmergencyCenter::overviewByVendor(std::string vendor){
+    return overviewSensorsInVector(getAllByVendor(vendor, getSensorList()));
+}
+
+void EmergencyCenter::overviewByType(std::string type){
+    return overviewSensorsInVector(getAllByType(type, getSensorList()));
+}
+
+void EmergencyCenter::overviewByLocation(std::string location){
+    return overviewSensorsInVector(getAllByLocation(location, getSensorList()));
+}
+
+void EmergencyCenter::overviewByLocationPointer(std::shared_ptr<Location> locationPointer){
+    return overviewSensorsInVector(getAllByLocationPointer(locationPointer));
+}
+
+
+void EmergencyCenter::activateAllInVector(std::vector<std::shared_ptr<Sensor>> sensorsToActivate){
+<<<<<<< HEAD
+    for(int i = 0; i<(int)sensorsToActivate.size(); i++){
+        ++*sensorsToActivate.at(i);
+=======
+    for(auto &s : sensorsToActivate){
+        ++*s;
+>>>>>>> 975c562e404ac42c025e77b999340887d08efe98
+    }
+}
+void EmergencyCenter::activateAllComponents(){
+    activateAllInVector(getSensorList());
+}
+
+void EmergencyCenter::activateAllByVendor(std::string vendor){
+    activateAllInVector(getAllByVendor(vendor, getSensorList()));
+}
+
+
+void EmergencyCenter::activateAllByType(std::string type){
+    activateAllInVector(getAllByType(type, getSensorList()));
+}
+
+void EmergencyCenter::activateAllByLocation(std::string location){
+    activateAllInVector(getAllByLocation(location, getSensorList()));
+}
+
+void EmergencyCenter::activateAllByLocationPointer(std::shared_ptr<Location> locationPointer)
+{
+    activateAllInVector(getAllByLocationPointer(locationPointer));
+}
+
+void EmergencyCenter::deActivateAllInVector(std::vector<std::shared_ptr<Sensor>> sensorsToDeactivate){
+    for(auto & s : sensorsToDeactivate){
+        --*s;
+    }
+}
+void EmergencyCenter::deActivateAllComponents(){
+    deActivateAllInVector(getSensorList());
+}
+
+void EmergencyCenter::deActivateAllByVendor(std::string vendor){
+    deActivateAllInVector(getAllByVendor(vendor, getSensorList()));
+}
+
+void EmergencyCenter::deActivateAllByType(std::string type){
+    deActivateAllInVector(getAllByType(type, getSensorList()));
+}
+
+void EmergencyCenter::deActivateAllByLocation(std::string location){
+    deActivateAllInVector(getAllByLocation(location, getSensorList()));
+}
+
+void EmergencyCenter::testAllComponentsInVector(std::vector<std::shared_ptr<Sensor>> sensorsToTest){
+    for(auto & s : sensorsToTest){
+        if(s->getIsActive()){ //we can only test active sensors
+            s->testSensorAction();
+        }
+    }
+}
+void EmergencyCenter::testAllComponents(){
+    testAllComponentsInVector(getSensorList());
+}
+
+void EmergencyCenter::testAllByVendor(std::string vendor){
+    testAllComponentsInVector(getAllByVendor(vendor, getSensorList()));
+}
+
+void EmergencyCenter::testAllByType(std::string type){
+    testAllComponentsInVector(getAllByType(type, getSensorList()));
+}
+
+void EmergencyCenter::testAllByLocation(std::string location){
+    testAllComponentsInVector(getAllByLocation(location, getSensorList()));
+}
+
+
+
+

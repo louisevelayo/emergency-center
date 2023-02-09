@@ -1,0 +1,25 @@
+/*
+#include "Component.h"
+
+void Component::trigger(bool trigger_variable) {
+	// TODO - implement Component::trigger
+	throw "Not yet implemented";
+}
+
+<<<<<<< HEAD
+void Component::activate(bool activation) {
+	// TODO - implement Component::activate
+	throw "Not yet implemented";
+}
+
+
+=======
+>>>>>>> 975c562e404ac42c025e77b999340887d08efe98
+void Component::addChild(std::shared_ptr<Component> componentchild) {
+	// TODO - implement Component::addChild
+	throw "Not yet implemented";
+}
+
+*/
+
+

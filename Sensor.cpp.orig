@@ -1,0 +1,146 @@
+#include "Sensor.h"
+#include "Component.h"
+#include <vector>
+#include <memory>
+#include <iostream>
+#include <string>
+
+
+/*
+int sensorID;
+std::string vendorName;
+std::string location;
+bool isTriggered{false};
+bool isActive{false};
+bool isPowered{false};
+std::vector<Strategy> strategies;
+*/
+
+int Sensor::countIDSensor= 0;
+
+Sensor::Sensor(std::string ven, std::string loc)
+    : vendorName(ven), location(loc)
+{    
+    this->sensorID =getCountIDSensor();
+    incrementCountIDSensor();
+    std::cout << "Sensor created with id: "<< this->sensorID << std::endl;
+}
+
+std::vector<std::shared_ptr<Strategy>> Sensor::getStrategies() const {
+    return this->strategies;
+}
+
+void Sensor::setStrategies(std::vector<std::shared_ptr<Strategy>> strategiesToSet) {
+    this->strategies = strategiesToSet;
+}
+
+void Sensor::addStrategy(std::shared_ptr<Strategy> strategyToAdd) {
+    (this->strategies).push_back(strategyToAdd);
+}
+
+int Sensor::getSensorID() const {
+	return this->sensorID;
+}
+
+void Sensor::setSensorType(std::string sensorType){
+    this->type = sensorType;
+}
+
+
+
+bool Sensor::getIsTriggered() const {
+	return this->isTriggered;
+}
+
+std::string Sensor::getVendorName() const {
+    return this->vendorName;
+}
+
+std::string Sensor::getSensorLocation() const{
+    return this->location;
+}
+
+std::string Sensor::getSensorType() const{
+    return this->type;
+}
+
+
+bool Sensor::getIsActive() const{
+	return this->isActive;
+}
+
+
+
+//getCountID is used to assign an ID to a sensor.
+int Sensor::getCountIDSensor() const{
+    return countIDSensor;
+}
+
+//incrementCountID increments countID after assigning an ID to a sensor.
+void Sensor::incrementCountIDSensor(){
+    this->countIDSensor++;
+}
+
+/*void Sensor::addChild(std::shared_ptr<Component> componentchild){
+    throw "error";
+    }
+*/
+
+/*
+void Sensor::trigger(bool trigger_variable){
+    this->isTriggered=trigger_variable;
+    if(isTriggered == 1){
+        auto strategyList =getStrategies();
+        for(unsigned long long i =0; i<strategyList.size(); i++ ){
+            strategyList[i]->execute();
+        }
+    }
+}
+
+<<<<<<< HEAD
+void Sensor::activate(bool activation){
+    this->isActive=activation;
+}
+*/
+=======
+>>>>>>> 975c562e404ac42c025e77b999340887d08efe98
+std::vector<std::shared_ptr<Sensor>> Sensor::getSensors(){
+    std::vector<std::shared_ptr<Sensor>> mySensor;
+    mySensor.push_back(shared_from_this());
+    return mySensor;
+
+}
+std::vector<std::shared_ptr<Location>> Sensor::getLocations(){
+    std::vector<std::shared_ptr<Location>> nothing;
+    return nothing;
+}
+
+void Sensor::testSensorAction(){
+    std::cout << "Sensor " << this->getSensorID() << "in location, " << this->getSensorLocation() << ", has been reached." << std::endl;
+}
+
+//operator overloading of ++ to activate Sensor.
+void Sensor::operator++(){
+    std::cout<<"a sensor has been activated : "<<this->getSensorID()<<std::endl;
+    this->isActive = 1;
+}
+
+//operator overloading of -- to deactivate Sensor.
+void Sensor::operator--(){
+    this->isActive = 0;
+}
+
+//operator overloading of << to display info of Sensor.
+std::ostream &operator<<(std::ostream &os, const Sensor &s){
+
+    os << "Sensor ID is " << s.getSensorID();
+    os << " The vendor is " << s.getVendorName();
+    os << " The location is " << s.getSensorLocation();
+    os << " The type of sensor is " << s.getSensorType();
+    os << " The sensor activation is " << std::boolalpha << s.getIsActive();
+    os << " Triggered is " << std::boolalpha << s.getIsTriggered();
+    return os;
+    }
+
+
+
